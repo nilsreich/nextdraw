@@ -3,20 +3,24 @@ import React, { useEffect, useState, useRef } from "react";
 import katex from "katex";
 import AsciiMathParser from "asciimath2tex";
 
-export default ({ editor }) => {
+export default (props) => {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    inputRef.current.focus();
-  }, []);
+    // inputRef.current.focus()
+    setEqn(katex.renderToString(parser.parse(props.node.attrs.count)));
+  }, [props]);
 
   const parser = new AsciiMathParser();
   const [value, setValue] = useState("asd");
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [eqn, setEqn] = useState("asd");
   const update = (e) => {
     setValue(e.target.value);
     setEqn(katex.renderToString(parser.parse(e.target.value)));
+    props.updateAttributes({
+      count: e.target.value,
+    });
   };
 
   const handleKeyDown = (e) => {
@@ -26,12 +30,11 @@ export default ({ editor }) => {
   };
   const showInput = () => {
     setVisible(!visible);
-    editor.commands.focus();
+    props.editor.commands.focus();
   };
   return (
-    <NodeViewWrapper class="bg-red-100 inline-block">
+    <NodeViewWrapper className="bg-red-100 inline-block">
       <div
-        class=""
         dangerouslySetInnerHTML={{ __html: eqn }}
         onClick={() => showInput()}
       />
